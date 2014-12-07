@@ -2,12 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nekofar.milad.binamcast" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
-        android:name=".common.BinamcastApplication"
+        android:name=".common.Binamcast"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/title_activity_main" >
@@ -17,6 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
