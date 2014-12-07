@@ -1,11 +1,11 @@
 package com.nekofar.milad.binamcast.model;
 
+import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.NamespaceList;
 import org.simpleframework.xml.Root;
-import org.simpleframework.xml.Text;
 
 import java.util.List;
 
@@ -15,55 +15,53 @@ import java.util.List;
 @Root(strict = false)
 public class Channel {
 
-    @ElementList(entry = "link", inline = true, required = false)
-    public List<Link> links;
+    @Element
+    public String title;
+
+    @Element (name = "lastBuildDate", required = false)
+    public String lastBuildDate;
 
     @ElementList(entry = "item", inline = true, required = true)
     public List<Item> items;
 
-    @Element (name = "pubDate", required = false)
-    String pubDate;
-
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "links=" + links +
-                ", items=" + items +
-                ", pubDate='" + pubDate + '\'' +
-                '}';
-    }
-
-    public static class Link {
-        @Text(required = false)
-        public String link;
+    public List<Item> getItems() {
+        return items;
     }
 
     @Root(name = "item", strict = false)
     public static class Item {
         @Element(name = "title", required = true)
-        String title;
+        public String title;
 
         @Element(name = "link", required = true)
-        String link;
+        public String link;
 
         @Element(name = "description", required = true)
-        String description;
+        public String description;
 
-        @Element(name = "encluosure", required = true)
-        String encluosure;
+        @Element(name = "encoded", required = false, data = true)
+        public String encoded;
 
         @Element(name = "pubDate", required = true)
-        String pubDate;
+        public String pubDate;
 
-        @Override
-        public String toString() {
-            return "Item{" +
-                    "title='" + title + '\'' +
-                    ", link='" + link + '\'' +
-                    ", description='" + description + '\'' +
-                    ", encluosure='" + encluosure + '\'' +
-                    ", pubDate='" + pubDate + '\'' +
-                    '}';
+        @ElementList(name = "enclosure", required = false, inline = true)
+        public List<Enclosure> enclosures;
+
+        public List<Enclosure> getEnclosures() {
+            return enclosures;
+        }
+
+        @Root(name = "enclosure", strict = false)
+        public static class Enclosure {
+            @Attribute
+            public String url;
+
+            @Attribute
+            public String length;
+
+            @Attribute
+            public String type;
         }
     }
 
