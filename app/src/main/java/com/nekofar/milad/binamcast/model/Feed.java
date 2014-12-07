@@ -1,23 +1,24 @@
 package com.nekofar.milad.binamcast.model;
 
+import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
-@Root
+@Root(strict=false,name="Rss")
 public class Feed {
+
+    @Attribute
+    String version;
 
     @Element
     Channel channel;
 
-    public Channel getChannel() {
-        return channel;
+    public String getVersion() {
+        return version;
     }
 
-    @Override
-    public String toString() {
-        return "Feed{" +
-                "channel=" + channel +
-                '}';
+    public Channel getChannel() {
+        return channel;
     }
 
 }
