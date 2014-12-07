@@ -1,18 +1,54 @@
 package com.nekofar.milad.binamcast.activity;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.nekofar.milad.binamcast.R;
+import com.nekofar.milad.binamcast.common.Binamcast;
+import com.nekofar.milad.binamcast.model.Feed;
+import com.nekofar.milad.binamcast.utility.FeedService;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class MainActivity extends ActionBarActivity {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    @Inject
+    public FeedService mFeedService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //
+        ((Binamcast) getApplication()).getObjectGraph().inject(this);
+
+        mFeedService.getFeed(new Callback<Feed>() {
+            @Override
+            public void success(Feed feed, Response response) {
+                List<Feed.Channel.Item> items = feed.getChannel().getItems();
+                for (Feed.Channel.Item item : items) {
+                    Log.d(TAG, item.title);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
+
     }
 
 
