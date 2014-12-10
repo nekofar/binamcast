@@ -14,12 +14,21 @@ public class Cast extends RealmObject {
     @Ignore
     private static final String TAG = Cast.class.getSimpleName();
 
+    private String id;
     private String name;
     private String link;
     private String text;
     private String file;
     private String image;
     private Date date;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -71,11 +80,12 @@ public class Cast extends RealmObject {
 
     public void setDate(String date) {
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.US);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
             this.date = dateFormat.parse(date);
 
         } catch (java.text.ParseException e) {
             Log.e(TAG, e.getMessage());
         }
     }
+
 }

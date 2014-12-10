@@ -10,6 +10,9 @@ import java.util.Map;
 public class Entry {
 
     @Element
+    private String id;
+
+    @Element
     private String title;
 
     @Element
@@ -20,6 +23,10 @@ public class Entry {
 
     @ElementMap(entry = "link", key = "rel", value = "href", attribute = true, inline = true)
     private Map<String, String> links;
+
+    public String getId() {
+        return id;
+    }
 
     public String getTitle() {
         return title;
