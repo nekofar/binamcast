@@ -12,6 +12,7 @@
         android:theme="@style/AppTheme" >
 
         <activity
+            android:screenOrientation="portrait"
             android:name=".activity.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>

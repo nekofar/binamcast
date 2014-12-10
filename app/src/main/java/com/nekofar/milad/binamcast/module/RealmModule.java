@@ -2,6 +2,8 @@ package com.nekofar.milad.binamcast.module;
 
 import android.content.Context;
 
+import com.nekofar.milad.binamcast.common.ForApplication;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -13,7 +15,7 @@ public class RealmModule {
 
     @Provides
     @Singleton
-    public Realm provideRealm(Context context) {
+    public Realm provideRealm(@ForApplication Context context) {
         return Realm.getInstance(context);
     }
 

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.nekofar.milad.binamcast.activity.MainActivity;
+import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.module.OttoModule;
 import com.nekofar.milad.binamcast.module.RealmModule;
 import com.nekofar.milad.binamcast.module.RetrofitModule;
@@ -40,7 +41,8 @@ public class Binamcast extends Application {
     @Module(
             injects = {
                     Binamcast.class,
-                    MainActivity.class
+                    MainActivity.class,
+                    CastsAdapter.class
             },
             includes = {
                     OttoModule.class,
@@ -57,6 +59,7 @@ public class Binamcast extends Application {
 
         @Provides
         @Singleton
+        @ForApplication
         public Context provideApplicationContext() {
             return mApplication;
         }

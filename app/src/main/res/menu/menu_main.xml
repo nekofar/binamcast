@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.nekofar.milad.binamcast.activity.MainActivity">
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:id="@+id/update_casts"
+        android:title="@string/update_casts"
+        android:orderInCategory="1"
+        android:icon="@android:drawable/ic_popup_sync"
+        app:showAsAction="ifRoom" />
 </menu>
