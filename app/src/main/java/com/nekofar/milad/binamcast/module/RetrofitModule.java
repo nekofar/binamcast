@@ -24,7 +24,7 @@ public class RetrofitModule {
         return new RestAdapter.Builder()
                 .setEndpoint("http://binamcast.ir")
                 .setConverter(new SimpleXMLConverter())
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLogLevel(RestAdapter.LogLevel.BASIC)
                 .build();
     }
 
