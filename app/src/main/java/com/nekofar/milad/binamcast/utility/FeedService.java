@@ -7,7 +7,7 @@ import retrofit.http.GET;
 
 public interface FeedService {
 
-    @GET("/feed")
+    @GET("/feed/atom")
     void getFeed(Callback<Feed> callback);
 
 }
