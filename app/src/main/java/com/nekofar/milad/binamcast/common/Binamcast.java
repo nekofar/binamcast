@@ -1,16 +1,21 @@
 package com.nekofar.milad.binamcast.common;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.nekofar.milad.binamcast.activity.MainActivity;
 import com.nekofar.milad.binamcast.module.OttoModule;
+import com.nekofar.milad.binamcast.module.RealmModule;
 import com.nekofar.milad.binamcast.module.RetrofitModule;
 
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.ObjectGraph;
+import dagger.Provides;
 
 public class Binamcast extends Application {
 
@@ -39,6 +44,7 @@ public class Binamcast extends Application {
             },
             includes = {
                     OttoModule.class,
+                    RealmModule.class,
                     RetrofitModule.class
             }
     )
@@ -47,6 +53,12 @@ public class Binamcast extends Application {
 
         public SimpleModule(Binamcast application) {
             this.mApplication = application;
+        }
+
+        @Provides
+        @Singleton
+        public Context provideApplicationContext() {
+            return mApplication;
         }
     }
 
