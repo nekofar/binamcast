@@ -3,6 +3,7 @@ package com.nekofar.milad.binamcast.common;
 import android.app.Application;
 import android.content.Context;
 
+import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.activity.MainActivity;
 import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.module.OttoModule;
@@ -17,6 +18,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.ObjectGraph;
 import dagger.Provides;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class Binamcast extends Application {
 
@@ -26,6 +28,10 @@ public class Binamcast extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // Initialize calligraphy with font
+        CalligraphyConfig.initDefault("BYekan.ttf", R.attr.fontPath);
+
+        // TODO
         mObjectGraph = ObjectGraph.create(getModules().toArray());
         mObjectGraph.inject(this);
     }

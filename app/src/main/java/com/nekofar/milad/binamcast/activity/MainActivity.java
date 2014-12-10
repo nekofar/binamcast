@@ -1,5 +1,6 @@
 package com.nekofar.milad.binamcast.activity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -33,6 +34,7 @@ import io.realm.RealmResults;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -88,6 +90,12 @@ public class MainActivity extends ActionBarActivity {
         mCastsAdapter.setContext(MainActivity.this);
         mRecyclerView.setAdapter(mCastsAdapter);
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        // Attach context using CalligraphyContextWrapper to set default fonts
+        super.attachBaseContext(new CalligraphyContextWrapper(newBase));
     }
 
     @Override

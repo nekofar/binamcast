@@ -56,5 +56,6 @@ dependencies {
     compile 'io.realm:realm-android:0.75.1'
     compile 'com.jakewharton:butterknife:6.0.0'
     compile 'com.squareup.picasso:picasso:2.4.0'
+    compile 'uk.co.chrisjenx:calligraphy:1.2.0'
     //    compile 'com.google.guava:guava:18.0'
 }
