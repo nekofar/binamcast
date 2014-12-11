@@ -11,9 +11,12 @@ import android.widget.TextView;
 import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.common.Binamcast;
 import com.nekofar.milad.binamcast.event.DownloadCastEvent;
+import com.nekofar.milad.binamcast.event.PlayCastEvent;
 import com.nekofar.milad.binamcast.model.Cast;
 import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -88,7 +91,13 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
     @DebugLog
     @Override
     public void onClick(View view) {
-        mBus.post(new DownloadCastEvent(view.getTag()));
+        Cast cast = (Cast) view.getTag();
+        File file = new File(cast.getPath());
+        if (file.exists() && file.isFile()) {
+            mBus.post(new PlayCastEvent(view.getTag()));
+        } else {
+            mBus.post(new DownloadCastEvent(view.getTag()));
+        }
     }
 
 }

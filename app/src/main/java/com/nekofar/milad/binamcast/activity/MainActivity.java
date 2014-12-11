@@ -16,6 +16,7 @@ import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.common.Binamcast;
 import com.nekofar.milad.binamcast.event.DownloadCastEvent;
+import com.nekofar.milad.binamcast.event.PlayCastEvent;
 import com.nekofar.milad.binamcast.event.UpdateCastsEvent;
 import com.nekofar.milad.binamcast.model.Cast;
 import com.nekofar.milad.binamcast.model.Entry;
@@ -134,7 +135,15 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Subscribe
-    public void doDownloadCast(DownloadCastEvent event) {
+    protected void doPlayCast(PlayCastEvent event) {
+        Cast cast = event.getCast();
+
+        //
+
+    }
+
+    @Subscribe
+    protected void doDownloadCast(DownloadCastEvent event) {
         Cast cast = event.getCast();
 
         // Get url of file from cast and pars it
