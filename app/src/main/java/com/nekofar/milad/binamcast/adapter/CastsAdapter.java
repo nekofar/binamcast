@@ -47,7 +47,6 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
 
     }
 
-    @DebugLog
     public void setCasts(RealmResults<Cast> casts) {
         this.mCasts = casts;
     }
