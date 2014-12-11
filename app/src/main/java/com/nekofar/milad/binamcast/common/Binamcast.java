@@ -9,6 +9,7 @@ import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.module.OttoModule;
 import com.nekofar.milad.binamcast.module.RealmModule;
 import com.nekofar.milad.binamcast.module.RetrofitModule;
+import com.nekofar.milad.binamcast.receiver.DownloadReceiver;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +50,7 @@ public class Binamcast extends Application {
                     Binamcast.class,
                     MainActivity.class,
                     CastsAdapter.class,
-                    CastsAdapter.ViewHolder.class
+                    DownloadReceiver.class
             },
             includes = {
                     OttoModule.class,
