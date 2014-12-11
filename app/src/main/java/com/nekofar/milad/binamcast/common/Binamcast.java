@@ -48,7 +48,8 @@ public class Binamcast extends Application {
             injects = {
                     Binamcast.class,
                     MainActivity.class,
-                    CastsAdapter.class
+                    CastsAdapter.class,
+                    CastsAdapter.ViewHolder.class
             },
             includes = {
                     OttoModule.class,

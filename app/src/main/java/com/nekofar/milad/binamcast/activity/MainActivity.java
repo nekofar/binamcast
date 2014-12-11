@@ -1,6 +1,8 @@
 package com.nekofar.milad.binamcast.activity;
 
+import android.app.DownloadManager;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -14,10 +16,14 @@ import android.view.MenuItem;
 import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.common.Binamcast;
+import com.nekofar.milad.binamcast.event.DownloadCastEvent;
+import com.nekofar.milad.binamcast.event.UpdateCastsEvent;
 import com.nekofar.milad.binamcast.model.Cast;
 import com.nekofar.milad.binamcast.model.Entry;
 import com.nekofar.milad.binamcast.model.Feed;
 import com.nekofar.milad.binamcast.utility.FeedService;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -41,6 +47,9 @@ public class MainActivity extends ActionBarActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     @Inject
+    public Bus mBus;
+
+    @Inject
     public FeedService mFeedService;
 
     @Inject
@@ -53,6 +62,7 @@ public class MainActivity extends ActionBarActivity {
     private DefaultItemAnimator mItemAnimator;
 
     private CastsAdapter mCastsAdapter;
+    private DownloadManager mDownloadManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +103,18 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        mBus.register(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mBus.unregister(this);
+    }
+
+    @Override
     protected void attachBaseContext(Context newBase) {
         // Attach context using CalligraphyContextWrapper to set default fonts
         super.attachBaseContext(new CalligraphyContextWrapper(newBase));
@@ -110,14 +132,25 @@ public class MainActivity extends ActionBarActivity {
         // Handle option menu actions
         switch (item.getItemId()) {
             case R.id.update_casts:
-                this.doUpdateCasts(); return true;
+                mBus.post(new UpdateCastsEvent()); return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
 
     }
 
-    private void doUpdateCasts() {
+    @Subscribe
+    public void doDownloadCast(DownloadCastEvent event) {
+        Cast cast = event.getCast();
+
+        mDownloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(cast.getFile());
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        Long reference = mDownloadManager.enqueue(request);
+    }
+
+    @Subscribe
+    public void doUpdateCasts(UpdateCastsEvent event) {
         // Create new instance of Realm
         mRealm.beginTransaction();
 
