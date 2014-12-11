@@ -139,15 +139,15 @@ public class MainActivity extends ActionBarActivity {
 
         // Get url of file from cast and pars it
         Uri uri = Uri.parse(cast.getFile());
-        //String fileName = uri.getLastPathSegment();
-        //fileName = fileName.replaceAll(" ", "_");
-        //fileName = fileName.replaceAll("[\"|\\\\?*<\":>+\\[\\]/']", "");
+        String fileName = uri.getLastPathSegment();
+        fileName = fileName.replaceAll(" ", "_");
+        fileName = fileName.replaceAll("[\"|\\\\?*<\":>+\\[\\]/']", "");
 
         // Create download manager request using url
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.setTitle(cast.getName());
         request.setDescription(getString(R.string.app_name));
-        //request.setDestinationUri(Uri.fromFile(new File(fileName)));
+        request.setDestinationInExternalPublicDir("/download/", fileName);
 
         // Using DownloadManager for download cast file
         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
