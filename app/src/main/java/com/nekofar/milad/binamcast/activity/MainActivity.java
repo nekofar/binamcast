@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -58,59 +57,53 @@ public class MainActivity extends ActionBarActivity {
     @InjectView(R.id.casts)
     public RecyclerView mRecyclerView;
 
-    private LinearLayoutManager mLayoutManager;
-    private DefaultItemAnimator mItemAnimator;
-
-    private CastsAdapter mCastsAdapter;
-    private DownloadManager mDownloadManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //
+        // Injecting ButterKnife
         ButterKnife.inject(this);
 
-        //
+        // Injecting Dagger modules
         ((Binamcast) getApplication()).getObjectGraph().inject(this);
 
-        //
-        mRecyclerView.setHasFixedSize(true);
-
-        //
+        // Get number of columns for grid view
         int columnCount = getResources().getInteger(R.integer.casts_column_count);
 
-        //
-        mLayoutManager = new LinearLayoutManager(this);
-        mLayoutManager = new GridLayoutManager(this, columnCount);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        // Initialize RecyclerView list
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, columnCount));
 
-        //
-        mItemAnimator = new DefaultItemAnimator();
-        mRecyclerView.setItemAnimator(mItemAnimator);
+        // Set animation for RecyclerView
+        DefaultItemAnimator animator = new DefaultItemAnimator();
+        mRecyclerView.setItemAnimator(animator);
 
-        //
+        // Get the list of casts sorted by date
         RealmResults<Cast> casts = mRealm.where(Cast.class).findAll();
         casts.sort("date", RealmResults.SORT_ORDER_DESCENDING);
 
-        //
-        mCastsAdapter = new CastsAdapter();
-        mCastsAdapter.setCasts(casts);
-        mCastsAdapter.setContext(MainActivity.this);
-        mRecyclerView.setAdapter(mCastsAdapter);
+        // Initialize CastsAdapter to populate RecyclerView
+        CastsAdapter adapter = new CastsAdapter();
+        adapter.setCasts(casts);
+        adapter.setContext(MainActivity.this);
+        mRecyclerView.setAdapter(adapter);
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Register Otto event bus
         mBus.register(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        // Unregister Otto event bus
         mBus.unregister(this);
     }
 
@@ -122,6 +115,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate menu layout
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -143,10 +137,21 @@ public class MainActivity extends ActionBarActivity {
     public void doDownloadCast(DownloadCastEvent event) {
         Cast cast = event.getCast();
 
-        mDownloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        // Get url of file from cast and pars it
         Uri uri = Uri.parse(cast.getFile());
+        //String fileName = uri.getLastPathSegment();
+        //fileName = fileName.replaceAll(" ", "_");
+        //fileName = fileName.replaceAll("[\"|\\\\?*<\":>+\\[\\]/']", "");
+
+        // Create download manager request using url
         DownloadManager.Request request = new DownloadManager.Request(uri);
-        Long reference = mDownloadManager.enqueue(request);
+        request.setTitle(cast.getName());
+        request.setDescription(getString(R.string.app_name));
+        //request.setDestinationUri(Uri.fromFile(new File(fileName)));
+
+        // Using DownloadManager for download cast file
+        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
     }
 
     @Subscribe
@@ -178,7 +183,8 @@ public class MainActivity extends ActionBarActivity {
                         cast.setText(entry.getContent());
                         cast.setDate(entry.getPublished());
                         cast.setLink(entry.getLinks().get("alternate"));
-                        cast.setFile(entry.getLinks().get("enclosure"));
+                        //cast.setFile(entry.getLinks().get("enclosure"));
+                        cast.setFile("http://192.168.101.50/Podcast_Binam_07_128.mp3");
 
                         // Extract image link from feed content
                         String image = entry.getContent();
