@@ -2,6 +2,7 @@ package com.nekofar.milad.binamcast.activity;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.common.Binamcast;
 import com.nekofar.milad.binamcast.event.DownloadCastEvent;
+import com.nekofar.milad.binamcast.event.InstallEvent;
 import com.nekofar.milad.binamcast.event.PauseCastEvent;
 import com.nekofar.milad.binamcast.event.PlayCastEvent;
 import com.nekofar.milad.binamcast.event.RefreshCastsEvent;
@@ -30,8 +32,12 @@ import com.nekofar.milad.binamcast.utility.FeedService;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
@@ -68,6 +74,7 @@ public class MainActivity extends ActionBarActivity {
     private RealmResults<Cast> mCasts;
     private CastsAdapter mCastsAdapter;
     private MediaPlayer mMediaPlayer;
+    private SharedPreferences mPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,9 +112,14 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar);
 
-        //
+        // Create new instance of media player
         mMediaPlayer = new MediaPlayer();
 
+        // Get SharedPreferences instance for storing sign-up state
+        mPreferences = getSharedPreferences("default", Context.MODE_PRIVATE);
+        if (!mPreferences.getBoolean("alreadyInstalled", false)) {
+            mBus.post(new InstallEvent());
+        }
     }
 
     @Override
@@ -282,6 +294,59 @@ public class MainActivity extends ActionBarActivity {
         mCastsAdapter.setCasts(mCasts);
         mCastsAdapter.setContext(MainActivity.this);
         mRecyclerView.setAdapter(mCastsAdapter);
+    }
+
+    @Subscribe
+    public void doInstallEvent(InstallEvent event) {
+        // Begin of new Realm transaction
+        mRealm.beginTransaction();
+
+        // Read string from file and convert to json string
+        String jsonString = "";
+        try {
+            InputStream inputStream = getAssets().open("data.json");
+            byte[] buffer = new byte[inputStream.available()];
+            inputStream.read(buffer);
+            inputStream.close();
+            jsonString = new String(buffer, "UTF-8");
+        } catch (IOException e) {
+            // Cancel Realm transaction on fail request
+            mRealm.cancelTransaction();
+
+            e.printStackTrace();
+        }
+
+        // Convert json string to the json array
+        JSONArray jsonArray = null;
+        try {
+            jsonArray = new JSONArray(jsonString);
+
+            // Read json array data and write to the database
+            for (int i = 0; i < jsonArray.length(); i++) {
+                // Create new cast object and populate it
+                Cast cast = mRealm.createObject(Cast.class);
+                cast.setId(jsonArray.getJSONObject(i).getString("id"));
+                cast.setName(jsonArray.getJSONObject(i).getString("name"));
+                cast.setText(jsonArray.getJSONObject(i).getString("text"));
+                cast.setDate(jsonArray.getJSONObject(i).getString("date"));
+                cast.setLink(jsonArray.getJSONObject(i).getString("link"));
+                cast.setFile(jsonArray.getJSONObject(i).getString("file"));
+                cast.setImage(jsonArray.getJSONObject(i).getString("image"));
+            }
+        } catch (JSONException e) {
+            // Cancel Realm transaction on fail request
+            mRealm.cancelTransaction();
+
+            e.printStackTrace();
+        }
+
+        // Commit Realm transaction
+        mRealm.commitTransaction();
+
+        // Set already installed to the true if data updated
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean("alreadyInstalled", true);
+        editor.apply();
     }
 
 }
