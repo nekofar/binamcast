@@ -25,10 +25,9 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import hugo.weaving.DebugLog;
 import io.realm.RealmResults;
 
-public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> implements View.OnClickListener {
+public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> {
 
     private static final String TAG = CastsAdapter.class.getSimpleName();
 
@@ -83,54 +82,60 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         // Get current cast using position
-        Cast cast = mCasts.get(position);
+        final Cast cast = mCasts.get(position);
 
         // Set cast title to the row
         holder.mCastTitle.setText(cast.getName());
 
-        // Set cast action buttons and listeners
+        // Show download button if cast file missing
         File file = new File(URI.create(cast.getPath()).getPath());
         if (file.exists() && file.isFile()) {
             holder.mCastPlay.setVisibility(View.VISIBLE);
             holder.mCastDownload.setVisibility(View.GONE);
-
-            holder.mCastPlay.setTag(cast);
-            holder.mCastPlay.setOnClickListener(this);
         } else {
             holder.mCastPlay.setVisibility(View.GONE);
             holder.mCastDownload.setVisibility(View.VISIBLE);
-
-            holder.mCastDownload.setTag(cast);
-            holder.mCastDownload.setOnClickListener(this);
         }
 
         // Set cast image using Picasso
         Picasso.with(mContext).load(cast.getImage()).into(holder.mCastImage);
+
+        // Hide play button and show pause on play
+        holder.mCastPlay.setTag(cast);
+        holder.mCastPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.mCastPlay.setVisibility(View.GONE);
+                holder.mCastPause.setVisibility(View.VISIBLE);
+                mBus.post(new PlayCastEvent(cast));
+            }
+        });
+
+        // Hide pause button and show play on pause
+        holder.mCastPause.setTag(cast);
+        holder.mCastPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.mCastPlay.setVisibility(View.VISIBLE);
+                holder.mCastPause.setVisibility(View.GONE);
+                mBus.post(new PauseCastEvent(cast));
+            }
+        });
+
+        // Post download event if download button clicked
+        holder.mCastDownload.setTag(cast);
+        holder.mCastDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mBus.post(new DownloadCastEvent(cast));
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mCasts.size();
     }
-
-    @DebugLog
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.play:
-                mBus.post(new PlayCastEvent(view.getTag()));
-                break;
-            case R.id.pause:
-                mBus.post(new PauseCastEvent(view.getTag()));
-                break;
-            case R.id.download:
-                mBus.post(new DownloadCastEvent(view.getTag()));
-                break;
-            default:
-                break;
-        }
-    }
-
 }

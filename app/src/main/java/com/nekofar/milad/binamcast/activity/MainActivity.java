@@ -2,6 +2,7 @@ package com.nekofar.milad.binamcast.activity;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -17,6 +18,7 @@ import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.common.Binamcast;
 import com.nekofar.milad.binamcast.event.DownloadCastEvent;
+import com.nekofar.milad.binamcast.event.PauseCastEvent;
 import com.nekofar.milad.binamcast.event.PlayCastEvent;
 import com.nekofar.milad.binamcast.event.RefreshCastsEvent;
 import com.nekofar.milad.binamcast.event.UpdateCastsEvent;
@@ -27,6 +29,7 @@ import com.nekofar.milad.binamcast.utility.FeedService;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
@@ -62,6 +65,7 @@ public class MainActivity extends ActionBarActivity {
 
     private RealmResults<Cast> mCasts;
     private CastsAdapter mCastsAdapter;
+    private MediaPlayer mMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +103,9 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar);
 
+        //
+        mMediaPlayer = new MediaPlayer();
+
     }
 
     @Override
@@ -115,6 +122,14 @@ public class MainActivity extends ActionBarActivity {
 
         // Unregister Otto event bus
         mBus.unregister(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //
+        mMediaPlayer.release();
     }
 
     @Override
@@ -148,7 +163,21 @@ public class MainActivity extends ActionBarActivity {
         Cast cast = event.getCast();
 
         //
+        try {
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(Uri.parse(cast.getPath()).getPath());
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Subscribe
+    public void doPauseCast(PauseCastEvent event) {
+        if (mMediaPlayer.isPlaying()) {
+            mMediaPlayer.pause();
+        }
     }
 
     @Subscribe
