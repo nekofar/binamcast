@@ -18,6 +18,7 @@ import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.common.Binamcast;
 import com.nekofar.milad.binamcast.event.DownloadCastEvent;
 import com.nekofar.milad.binamcast.event.PlayCastEvent;
+import com.nekofar.milad.binamcast.event.RefreshCastsEvent;
 import com.nekofar.milad.binamcast.event.UpdateCastsEvent;
 import com.nekofar.milad.binamcast.model.Cast;
 import com.nekofar.milad.binamcast.model.Entry;
@@ -217,11 +218,8 @@ public class MainActivity extends ActionBarActivity {
                     }
                 }
 
-                // Update CastsAdapter to re-populate RecyclerView
-                mCastsAdapter = new CastsAdapter();
-                mCastsAdapter.setCasts(mCasts);
-                mCastsAdapter.setContext(MainActivity.this);
-                mRecyclerView.setAdapter(mCastsAdapter);
+                // Refresh casts list after successful request
+                mBus.post(new RefreshCastsEvent());
 
                 // Commit Realm transaction
                 mRealm.commitTransaction();
@@ -234,4 +232,14 @@ public class MainActivity extends ActionBarActivity {
             }
         });
     }
+
+    @Subscribe
+    public void doRefreshCasts(RefreshCastsEvent event) {
+        // Update CastsAdapter to re-populate RecyclerView
+        mCastsAdapter = new CastsAdapter();
+        mCastsAdapter.setCasts(mCasts);
+        mCastsAdapter.setContext(MainActivity.this);
+        mRecyclerView.setAdapter(mCastsAdapter);
+    }
+
 }

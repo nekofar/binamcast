@@ -9,7 +9,9 @@ import android.util.Log;
 
 import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.common.Binamcast;
+import com.nekofar.milad.binamcast.event.RefreshCastsEvent;
 import com.nekofar.milad.binamcast.model.Cast;
+import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
 
@@ -18,6 +20,9 @@ import io.realm.Realm;
 public class DownloadReceiver extends BroadcastReceiver {
 
     private static final String TAG = DownloadReceiver.class.getSimpleName();
+
+    @Inject
+    protected Bus mBus;
 
     @Inject
     protected Realm mRealm;
@@ -49,6 +54,9 @@ public class DownloadReceiver extends BroadcastReceiver {
             mRealm.beginTransaction();
             cast.setPath(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)));
             mRealm.commitTransaction();
+
+            // Refresh casts list after successful download
+            mBus.post(new RefreshCastsEvent());
 
             Log.d(TAG, cast.getPath());
         }
