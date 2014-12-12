@@ -2,6 +2,7 @@ package com.nekofar.milad.binamcast.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.IconicsButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,10 +37,13 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         @InjectView(R.id.title)
-        public TextView mCastTitle;
+        protected TextView mCastTitle;
 
         @InjectView(R.id.image)
-        public ImageView mCastImage;
+        protected ImageView mCastImage;
+
+        @InjectView(R.id.action)
+        protected IconicsButton mCastAction;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -73,11 +77,19 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         // Get current cast using position
         Cast cast = mCasts.get(position);
 
+        // Set cast title to the row
         holder.mCastTitle.setText(cast.getName());
 
+        // Set cast action button and it's listener
+        holder.mCastAction.setTag(cast);
+        holder.mCastAction.setOnClickListener(this);
+
         //
-        holder.mCastImage.setTag(cast);
-        holder.mCastImage.setOnClickListener(this);
+        if (cast.getPath().equals("")) {
+            holder.mCastAction.setText("{gmd-cloud-circle}");
+        } else {
+            holder.mCastAction.setText("{gmd-play-circle-fill}");
+        }
 
         // Set cast image using Picasso
         Picasso.with(mContext).load(cast.getImage()).into(holder.mCastImage);
