@@ -239,18 +239,22 @@ public class MainActivity extends ActionBarActivity {
                 List<Entry> entries = feed.getEntries();
                 for (Entry entry : entries) {
 
-                    Log.v(TAG, entry.getId());
+                    // Extract real id from entry uri
+                    String[] split = entry.getId().split("=");
+                    String entryId = split[split.length - 1];
+
+                    Log.v(TAG, entryId + ":" + entry.getId());
 
                     // Try to prevent duplication of Casts
                     Cast cast = null;
                     cast = mRealm.where(Cast.class)
-                            .equalTo("id", entry.getId())
+                            .equalTo("id", entryId)
                             .findFirst();
 
                     if (cast == null) {
                         // Create new Cast object
                         cast = mRealm.createObject(Cast.class);
-                        cast.setId(entry.getId());
+                        cast.setId(entryId);
                         cast.setName(entry.getTitle());
                         cast.setText(entry.getContent());
                         cast.setDate(entry.getPublished());
