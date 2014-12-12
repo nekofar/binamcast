@@ -58,6 +58,9 @@ public class MainActivity extends ActionBarActivity {
     @InjectView(R.id.casts)
     protected RecyclerView mRecyclerView;
 
+    private RealmResults<Cast> mCasts;
+    private CastsAdapter mCastsAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,14 +84,14 @@ public class MainActivity extends ActionBarActivity {
         mRecyclerView.setItemAnimator(animator);
 
         // Get the list of casts sorted by date
-        RealmResults<Cast> casts = mRealm.where(Cast.class).findAll();
-        casts.sort("date", RealmResults.SORT_ORDER_DESCENDING);
+        mCasts = mRealm.where(Cast.class).findAll();
+        mCasts.sort("date", RealmResults.SORT_ORDER_DESCENDING);
 
         // Initialize CastsAdapter to populate RecyclerView
-        CastsAdapter adapter = new CastsAdapter();
-        adapter.setCasts(casts);
-        adapter.setContext(MainActivity.this);
-        mRecyclerView.setAdapter(adapter);
+        mCastsAdapter = new CastsAdapter();
+        mCastsAdapter.setCasts(mCasts);
+        mCastsAdapter.setContext(MainActivity.this);
+        mRecyclerView.setAdapter(mCastsAdapter);
 
     }
 
@@ -208,6 +211,12 @@ public class MainActivity extends ActionBarActivity {
                         cast.setImage(image);
                     }
                 }
+
+                // Update CastsAdapter to re-populate RecyclerView
+                mCastsAdapter = new CastsAdapter();
+                mCastsAdapter.setCasts(mCasts);
+                mCastsAdapter.setContext(MainActivity.this);
+                mRecyclerView.setAdapter(mCastsAdapter);
 
                 // Commit Realm transaction
                 mRealm.commitTransaction();
