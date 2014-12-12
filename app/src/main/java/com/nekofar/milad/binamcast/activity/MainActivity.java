@@ -20,7 +20,6 @@ import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.common.Binamcast;
 import com.nekofar.milad.binamcast.event.DownloadCastEvent;
-import com.nekofar.milad.binamcast.event.InstallEvent;
 import com.nekofar.milad.binamcast.event.PauseCastEvent;
 import com.nekofar.milad.binamcast.event.PlayCastEvent;
 import com.nekofar.milad.binamcast.event.RefreshCastsEvent;
@@ -118,7 +117,7 @@ public class MainActivity extends ActionBarActivity {
         // Get SharedPreferences instance for storing sign-up state
         mPreferences = getSharedPreferences("default", Context.MODE_PRIVATE);
         if (!mPreferences.getBoolean("alreadyInstalled", false)) {
-            mBus.post(new InstallEvent());
+            doPopulateCasts();
         }
     }
 
@@ -296,10 +295,10 @@ public class MainActivity extends ActionBarActivity {
         mRecyclerView.setAdapter(mCastsAdapter);
     }
 
-    @Subscribe
-    public void doInstallEvent(InstallEvent event) {
+    public void doPopulateCasts() {
         // Begin of new Realm transaction
         mRealm.beginTransaction();
+
 
         // Read string from file and convert to json string
         String jsonString = "";
@@ -332,6 +331,8 @@ public class MainActivity extends ActionBarActivity {
                 cast.setLink(jsonArray.getJSONObject(i).getString("link"));
                 cast.setFile(jsonArray.getJSONObject(i).getString("file"));
                 cast.setImage(jsonArray.getJSONObject(i).getString("image"));
+
+                Log.v(TAG, cast.getId());
             }
         } catch (JSONException e) {
             // Cancel Realm transaction on fail request
