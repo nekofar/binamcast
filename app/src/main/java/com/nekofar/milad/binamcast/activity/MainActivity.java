@@ -4,6 +4,7 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -92,6 +93,10 @@ public class MainActivity extends ActionBarActivity {
         mCastsAdapter.setCasts(mCasts);
         mCastsAdapter.setContext(MainActivity.this);
         mRecyclerView.setAdapter(mCastsAdapter);
+
+        // Customize acton bar layout
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.action_bar);
 
     }
 
