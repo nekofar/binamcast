@@ -6,5 +6,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="update_casts">به روز رسانی</string>
+    <string name="ic_download">{gmd-cloud-circle}</string>
+    <string name="ic_play">{gmd-play-circle-fill}</string>
+    <string name="ic_pause">{gmd-pause-circle-fill}</string>
 
 </resources>
