@@ -5,6 +5,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,6 +30,7 @@ import com.nekofar.milad.binamcast.utility.FeedService;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -190,15 +192,27 @@ public class MainActivity extends ActionBarActivity {
         fileName = fileName.replaceAll(" ", "_");
         fileName = fileName.replaceAll("[\"|\\\\?*<\":>+\\[\\]/']", "");
 
-        // Create download manager request using url
-        DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setTitle(cast.getName());
-        request.setDescription(getString(R.string.app_name));
-        request.setDestinationInExternalPublicDir("/download/", fileName);
+        // Check if cast file not exist and then start download
+        String filePath = Environment.getExternalStorageDirectory() + "/download/" + fileName;
+        File file = new File(filePath);
+        if (!file.exists() || !file.isFile()) {
 
-        // Using DownloadManager for download cast file
-        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
+            // Create download manager request using url
+            DownloadManager.Request request = new DownloadManager.Request(uri);
+            request.setTitle(cast.getName());
+            request.setDescription(getString(R.string.app_name));
+            request.setDestinationInExternalPublicDir("/download/", fileName);
+
+            // Using DownloadManager for download cast file
+            DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+            manager.enqueue(request);
+
+        }
+        else {
+            // Refresh casts list if cast file exist
+            mBus.post(new RefreshCastsEvent());
+        }
+
     }
 
     @Subscribe
