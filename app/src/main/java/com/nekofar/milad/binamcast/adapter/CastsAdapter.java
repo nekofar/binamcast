@@ -12,12 +12,14 @@ import android.widget.TextView;
 import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.common.Binamcast;
 import com.nekofar.milad.binamcast.event.DownloadCastEvent;
+import com.nekofar.milad.binamcast.event.PauseCastEvent;
 import com.nekofar.milad.binamcast.event.PlayCastEvent;
 import com.nekofar.milad.binamcast.model.Cast;
 import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.net.URI;
 
 import javax.inject.Inject;
 
@@ -27,6 +29,8 @@ import hugo.weaving.DebugLog;
 import io.realm.RealmResults;
 
 public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> implements View.OnClickListener {
+
+    private static final String TAG = CastsAdapter.class.getSimpleName();
 
     @Inject
     public Bus mBus;
@@ -42,8 +46,14 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         @InjectView(R.id.image)
         protected ImageView mCastImage;
 
-        @InjectView(R.id.action)
-        protected IconicsButton mCastAction;
+        @InjectView(R.id.play)
+        protected IconicsButton mCastPlay;
+
+        @InjectView(R.id.pause)
+        protected IconicsButton mCastPause;
+
+        @InjectView(R.id.download)
+        protected IconicsButton mCastDownload;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -80,15 +90,20 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         // Set cast title to the row
         holder.mCastTitle.setText(cast.getName());
 
-        // Set cast action button and it's listener
-        holder.mCastAction.setTag(cast);
-        holder.mCastAction.setOnClickListener(this);
+        // Set cast action buttons and listeners
+        File file = new File(URI.create(cast.getPath()).getPath());
+        if (file.exists() && file.isFile()) {
+            holder.mCastPlay.setVisibility(View.VISIBLE);
+            holder.mCastDownload.setVisibility(View.GONE);
 
-        //
-        if (cast.getPath().equals("")) {
-            holder.mCastAction.setText("{gmd-cloud-circle}");
+            holder.mCastPlay.setTag(cast);
+            holder.mCastPlay.setOnClickListener(this);
         } else {
-            holder.mCastAction.setText("{gmd-play-circle-fill}");
+            holder.mCastPlay.setVisibility(View.GONE);
+            holder.mCastDownload.setVisibility(View.VISIBLE);
+
+            holder.mCastDownload.setTag(cast);
+            holder.mCastDownload.setOnClickListener(this);
         }
 
         // Set cast image using Picasso
@@ -103,12 +118,18 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
     @DebugLog
     @Override
     public void onClick(View view) {
-        Cast cast = (Cast) view.getTag();
-        File file = new File(cast.getPath());
-        if (file.exists() && file.isFile()) {
-            mBus.post(new PlayCastEvent(view.getTag()));
-        } else {
-            mBus.post(new DownloadCastEvent(view.getTag()));
+        switch (view.getId()) {
+            case R.id.play:
+                mBus.post(new PlayCastEvent(view.getTag()));
+                break;
+            case R.id.pause:
+                mBus.post(new PauseCastEvent(view.getTag()));
+                break;
+            case R.id.download:
+                mBus.post(new DownloadCastEvent(view.getTag()));
+                break;
+            default:
+                break;
         }
     }
 
