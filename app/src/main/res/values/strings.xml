@@ -9,5 +9,6 @@
     <string name="ic_download">{gmd-cloud-circle}</string>
     <string name="ic_play">{gmd-play-circle-fill}</string>
     <string name="ic_pause">{gmd-pause-circle-fill}</string>
+    <string name="ic_link">{gmd-info}</string>
 
 </resources>

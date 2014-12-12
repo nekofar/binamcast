@@ -1,6 +1,8 @@
 package com.nekofar.milad.binamcast.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.IconicsButton;
 import android.view.LayoutInflater;
@@ -44,6 +46,9 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
 
         @InjectView(R.id.image)
         protected ImageView mCastImage;
+
+        @InjectView(R.id.link)
+        protected IconicsButton mCastLink;
 
         @InjectView(R.id.play)
         protected IconicsButton mCastPlay;
@@ -130,6 +135,18 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
             @Override
             public void onClick(View v) {
                 mBus.post(new DownloadCastEvent(cast));
+            }
+        });
+
+        // Open podcast in browser on click
+        holder.mCastLink.setTag(cast);
+        holder.mCastLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(cast.getLink()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                mContext.startActivity(intent);
             }
         });
     }
