@@ -3,6 +3,9 @@ package com.nekofar.milad.binamcast.common;
 import android.app.Application;
 import android.content.Context;
 
+import com.mikpenz.google_material_typeface_library.GoogleMaterial;
+import com.mikpenz.iconics.Iconics;
+import com.mikpenz.meteocons_typeface_library.Meteoconcs;
 import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.activity.MainActivity;
 import com.nekofar.milad.binamcast.adapter.CastsAdapter;
@@ -35,6 +38,9 @@ public class Binamcast extends Application {
         // TODO
         mObjectGraph = ObjectGraph.create(getModules().toArray());
         mObjectGraph.inject(this);
+
+        Iconics.registerFont(new Meteoconcs());
+        Iconics.registerFont(new GoogleMaterial());
     }
 
     private List<Object> getModules() {
