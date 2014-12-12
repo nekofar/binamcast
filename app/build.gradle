@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.nekofar.milad.binamcast"
-        minSdkVersion 9
+        minSdkVersion 10
         targetSdkVersion 21
         versionCode 1
         versionName "0.0.1"
@@ -58,5 +58,7 @@ dependencies {
     compile 'com.jakewharton:butterknife:6.0.0'
     compile 'com.squareup.picasso:picasso:2.4.0'
     compile 'uk.co.chrisjenx:calligraphy:1.2.0'
-    //    compile 'com.google.guava:guava:18.0'
+    compile 'com.mikepenz.iconics:library:0.6.6@aar'
+    compile 'com.mikepenz.iconics:meteocons-typeface:1.0.1@aar'
+    compile 'com.mikepenz.iconics:google-material-typeface:1.0.1@aar'
 }
