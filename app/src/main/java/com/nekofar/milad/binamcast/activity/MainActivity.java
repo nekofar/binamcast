@@ -2,8 +2,11 @@ package com.nekofar.milad.binamcast.activity;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -17,6 +20,7 @@ import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.adapter.CastsAdapter;
 import com.nekofar.milad.binamcast.common.Binamcast;
 import com.nekofar.milad.binamcast.event.DownloadCastEvent;
+import com.nekofar.milad.binamcast.event.PauseCastEvent;
 import com.nekofar.milad.binamcast.event.PlayCastEvent;
 import com.nekofar.milad.binamcast.event.RefreshCastsEvent;
 import com.nekofar.milad.binamcast.event.UpdateCastsEvent;
@@ -27,6 +31,12 @@ import com.nekofar.milad.binamcast.utility.FeedService;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
@@ -62,6 +72,8 @@ public class MainActivity extends ActionBarActivity {
 
     private RealmResults<Cast> mCasts;
     private CastsAdapter mCastsAdapter;
+    private MediaPlayer mMediaPlayer;
+    private SharedPreferences mPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +111,14 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar);
 
+        // Create new instance of media player
+        mMediaPlayer = new MediaPlayer();
+
+        // Get SharedPreferences instance for storing sign-up state
+        mPreferences = getSharedPreferences("default", Context.MODE_PRIVATE);
+        if (!mPreferences.getBoolean("alreadyInstalled", false)) {
+            doPopulateCasts();
+        }
     }
 
     @Override
@@ -115,6 +135,14 @@ public class MainActivity extends ActionBarActivity {
 
         // Unregister Otto event bus
         mBus.unregister(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //
+        mMediaPlayer.release();
     }
 
     @Override
@@ -148,7 +176,21 @@ public class MainActivity extends ActionBarActivity {
         Cast cast = event.getCast();
 
         //
+        try {
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(Uri.parse(cast.getPath()).getPath());
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Subscribe
+    public void doPauseCast(PauseCastEvent event) {
+        if (mMediaPlayer.isPlaying()) {
+            mMediaPlayer.pause();
+        }
     }
 
     @Subscribe
@@ -161,15 +203,27 @@ public class MainActivity extends ActionBarActivity {
         fileName = fileName.replaceAll(" ", "_");
         fileName = fileName.replaceAll("[\"|\\\\?*<\":>+\\[\\]/']", "");
 
-        // Create download manager request using url
-        DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setTitle(cast.getName());
-        request.setDescription(getString(R.string.app_name));
-        request.setDestinationInExternalPublicDir("/download/", fileName);
+        // Check if cast file not exist and then start download
+        String filePath = Environment.getExternalStorageDirectory() + "/download/" + fileName;
+        File file = new File(filePath);
+        if (!file.exists() || !file.isFile()) {
 
-        // Using DownloadManager for download cast file
-        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
+            // Create download manager request using url
+            DownloadManager.Request request = new DownloadManager.Request(uri);
+            request.setTitle(cast.getName());
+            request.setDescription(getString(R.string.app_name));
+            request.setDestinationInExternalPublicDir("/download/", fileName);
+
+            // Using DownloadManager for download cast file
+            DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+            manager.enqueue(request);
+
+        }
+        else {
+            // Refresh casts list if cast file exist
+            mBus.post(new RefreshCastsEvent());
+        }
+
     }
 
     @Subscribe
@@ -185,24 +239,27 @@ public class MainActivity extends ActionBarActivity {
                 List<Entry> entries = feed.getEntries();
                 for (Entry entry : entries) {
 
-                    Log.v(TAG, entry.getId());
+                    // Extract real id from entry uri
+                    String[] split = entry.getId().split("=");
+                    String entryId = split[split.length - 1];
+
+                    Log.v(TAG, entryId + ":" + entry.getId());
 
                     // Try to prevent duplication of Casts
                     Cast cast = null;
                     cast = mRealm.where(Cast.class)
-                            .equalTo("id", entry.getId())
+                            .equalTo("id", entryId)
                             .findFirst();
 
                     if (cast == null) {
                         // Create new Cast object
                         cast = mRealm.createObject(Cast.class);
-                        cast.setId(entry.getId());
+                        cast.setId(entryId);
                         cast.setName(entry.getTitle());
                         cast.setText(entry.getContent());
                         cast.setDate(entry.getPublished());
                         cast.setLink(entry.getLinks().get("alternate"));
-                        //cast.setFile(entry.getLinks().get("enclosure"));
-                        cast.setFile("http://192.168.101.50/Podcast_Binam_07_128.mp3");
+                        cast.setFile(entry.getLinks().get("enclosure"));
 
                         // Extract image link from feed content
                         String image = entry.getContent();
@@ -240,6 +297,61 @@ public class MainActivity extends ActionBarActivity {
         mCastsAdapter.setCasts(mCasts);
         mCastsAdapter.setContext(MainActivity.this);
         mRecyclerView.setAdapter(mCastsAdapter);
+    }
+
+    public void doPopulateCasts() {
+        // Begin of new Realm transaction
+        mRealm.beginTransaction();
+
+
+        // Read string from file and convert to json string
+        String jsonString = "";
+        try {
+            InputStream inputStream = getAssets().open("data.json");
+            byte[] buffer = new byte[inputStream.available()];
+            inputStream.read(buffer);
+            inputStream.close();
+            jsonString = new String(buffer, "UTF-8");
+        } catch (IOException e) {
+            // Cancel Realm transaction on fail request
+            mRealm.cancelTransaction();
+
+            e.printStackTrace();
+        }
+
+        // Convert json string to the json array
+        JSONArray jsonArray = null;
+        try {
+            jsonArray = new JSONArray(jsonString);
+
+            // Read json array data and write to the database
+            for (int i = 0; i < jsonArray.length(); i++) {
+                // Create new cast object and populate it
+                Cast cast = mRealm.createObject(Cast.class);
+                cast.setId(jsonArray.getJSONObject(i).getString("id"));
+                cast.setName(jsonArray.getJSONObject(i).getString("name"));
+                cast.setText(jsonArray.getJSONObject(i).getString("text"));
+                cast.setDate(jsonArray.getJSONObject(i).getString("date"));
+                cast.setLink(jsonArray.getJSONObject(i).getString("link"));
+                cast.setFile(jsonArray.getJSONObject(i).getString("file"));
+                cast.setImage(jsonArray.getJSONObject(i).getString("image"));
+
+                Log.v(TAG, cast.getId());
+            }
+        } catch (JSONException e) {
+            // Cancel Realm transaction on fail request
+            mRealm.cancelTransaction();
+
+            e.printStackTrace();
+        }
+
+        // Commit Realm transaction
+        mRealm.commitTransaction();
+
+        // Set already installed to the true if data updated
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean("alreadyInstalled", true);
+        editor.apply();
     }
 
 }

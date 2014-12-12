@@ -61,4 +61,5 @@ dependencies {
     compile 'com.mikepenz.iconics:library:0.6.6@aar'
     compile 'com.mikepenz.iconics:meteocons-typeface:1.0.1@aar'
     compile 'com.mikepenz.iconics:google-material-typeface:1.0.1@aar'
+    compile 'com.google.code.gson:gson:2.3.1'
 }
