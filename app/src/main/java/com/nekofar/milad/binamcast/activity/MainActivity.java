@@ -230,8 +230,7 @@ public class MainActivity extends ActionBarActivity {
                         cast.setText(entry.getContent());
                         cast.setDate(entry.getPublished());
                         cast.setLink(entry.getLinks().get("alternate"));
-                        //cast.setFile(entry.getLinks().get("enclosure"));
-                        cast.setFile("http://192.168.101.50/Podcast_Binam_07_128.mp3");
+                        cast.setFile(entry.getLinks().get("enclosure"));
 
                         // Extract image link from feed content
                         String image = entry.getContent();
