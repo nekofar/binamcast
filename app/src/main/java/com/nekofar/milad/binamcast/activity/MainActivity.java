@@ -47,16 +47,16 @@ public class MainActivity extends ActionBarActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     @Inject
-    public Bus mBus;
+    protected Bus mBus;
 
     @Inject
-    public FeedService mFeedService;
+    protected FeedService mFeedService;
 
     @Inject
-    public Realm mRealm;
+    protected Realm mRealm;
 
     @InjectView(R.id.casts)
-    public RecyclerView mRecyclerView;
+    protected RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +135,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Subscribe
-    protected void doPlayCast(PlayCastEvent event) {
+    public void doPlayCast(PlayCastEvent event) {
         Cast cast = event.getCast();
 
         //
@@ -143,7 +143,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Subscribe
-    protected void doDownloadCast(DownloadCastEvent event) {
+    public void doDownloadCast(DownloadCastEvent event) {
         Cast cast = event.getCast();
 
         // Get url of file from cast and pars it
