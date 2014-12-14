@@ -108,22 +108,21 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         Picasso.with(mContext).load(cast.getImage()).into(holder.mCastImage);
 
         // Hide play button and show pause on play
+        holder.mCastPlay.setTag(cast);
         holder.mCastPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.mCastPlay.setVisibility(View.GONE);
-                holder.mCastPause.setVisibility(View.VISIBLE);
-                mBus.post(new PlayCastEvent(cast));
+                mBus.post(new PlayCastEvent(v));
             }
         });
 
         // Hide pause button and show play on pause
+        holder.mCastPause.setTag(cast);
         holder.mCastPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.mCastPlay.setVisibility(View.VISIBLE);
-                holder.mCastPause.setVisibility(View.GONE);
-                mBus.post(new PauseCastEvent(cast));
+                notifyDataSetChanged();
+                mBus.post(new PauseCastEvent(v));
             }
         });
 

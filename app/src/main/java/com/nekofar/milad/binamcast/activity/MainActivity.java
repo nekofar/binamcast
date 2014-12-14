@@ -13,8 +13,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.IconicsButton;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.nekofar.milad.binamcast.R;
 import com.nekofar.milad.binamcast.adapter.CastsAdapter;
@@ -174,6 +176,32 @@ public class MainActivity extends ActionBarActivity {
     @Subscribe
     public void doPlayCast(PlayCastEvent event) {
         Cast cast = event.getCast();
+
+        // TODO: Remember to fix mass this later
+        for (int i = 0; i < mRecyclerView.getChildCount(); i++) {
+            View view = mRecyclerView.getChildAt(i);
+            IconicsButton play = (IconicsButton) view.findViewById(R.id.play);
+            IconicsButton pause = (IconicsButton) view.findViewById(R.id.pause);
+            IconicsButton download =  (IconicsButton) view.findViewById(R.id.download);
+
+            if (download.getVisibility() == View.VISIBLE) {
+                play.setVisibility(View.GONE);
+                pause.setVisibility(View.GONE);
+                download.setVisibility(View.VISIBLE);
+            } else if (play == event.getView()) {
+                play.setVisibility(View.GONE);
+                pause.setVisibility(View.VISIBLE);
+                download.setVisibility(View.GONE);
+            } else if (pause == event.getView()) {
+                play.setVisibility(View.VISIBLE);
+                pause.setVisibility(View.GONE);
+                download.setVisibility(View.GONE);
+            } else {
+                play.setVisibility(View.VISIBLE);
+                pause.setVisibility(View.GONE);
+                download.setVisibility(View.GONE);
+            }
+        }
 
         // Set cast file path and play it
         try {
