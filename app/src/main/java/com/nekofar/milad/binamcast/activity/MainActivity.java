@@ -175,7 +175,7 @@ public class MainActivity extends ActionBarActivity {
     public void doPlayCast(PlayCastEvent event) {
         Cast cast = event.getCast();
 
-        //
+        // Set cast file path and play it
         try {
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(Uri.parse(cast.getPath()).getPath());
@@ -242,8 +242,6 @@ public class MainActivity extends ActionBarActivity {
                     // Extract real id from entry uri
                     String[] split = entry.getId().split("=");
                     String entryId = split[split.length - 1];
-
-                    Log.v(TAG, entryId + ":" + entry.getId());
 
                     // Try to prevent duplication of Casts
                     Cast cast = null;
