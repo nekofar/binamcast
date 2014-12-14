@@ -37,6 +37,7 @@
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
                 android:text="@string/ic_link"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="24sp"
                 android:visibility="visible" />
 
@@ -48,6 +49,7 @@
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
                 android:text="@string/ic_download"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="24sp"
                 android:visibility="visible" />
 
@@ -59,6 +61,7 @@
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
                 android:text="@string/ic_play"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="24sp"
                 android:visibility="gone" />
 
@@ -70,6 +73,7 @@
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
                 android:text="@string/ic_pause"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="24sp"
                 android:visibility="gone" />
 
