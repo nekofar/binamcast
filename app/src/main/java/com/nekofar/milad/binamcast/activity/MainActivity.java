@@ -141,7 +141,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        //
+        // Release resource of Media Player
         mMediaPlayer.release();
     }
 

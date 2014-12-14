@@ -108,7 +108,6 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         Picasso.with(mContext).load(cast.getImage()).into(holder.mCastImage);
 
         // Hide play button and show pause on play
-        holder.mCastPlay.setTag(cast);
         holder.mCastPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,7 +118,6 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         });
 
         // Hide pause button and show play on pause
-        holder.mCastPause.setTag(cast);
         holder.mCastPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,7 +128,6 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         });
 
         // Post download event if download button clicked
-        holder.mCastDownload.setTag(cast);
         holder.mCastDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,7 +136,6 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         });
 
         // Open podcast in browser on click
-        holder.mCastLink.setTag(cast);
         holder.mCastLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
