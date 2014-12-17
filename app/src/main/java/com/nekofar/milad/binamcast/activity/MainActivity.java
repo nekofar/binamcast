@@ -362,7 +362,7 @@ public class MainActivity extends ActionBarActivity {
                 cast.setFile(jsonArray.getJSONObject(i).getString("file"));
                 cast.setImage(jsonArray.getJSONObject(i).getString("image"));
 
-                Log.v(TAG, cast.getId());
+                Log.v(TAG, cast.getDate().toString() + ":" + cast.getName());
             }
         } catch (JSONException e) {
             // Cancel Realm transaction on fail request
