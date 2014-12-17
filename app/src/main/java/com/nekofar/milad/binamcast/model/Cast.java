@@ -84,14 +84,14 @@ public class Cast extends RealmObject {
     }
 
     public void setDate(Date date) {
+        Log.v(TAG, date.toString());
         this.date = date;
     }
 
     public void setDate(String date) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
-            this.date = dateFormat.parse(date);
-
+            this.setDate(dateFormat.parse(date));
         } catch (java.text.ParseException e) {
             Log.e(TAG, e.getMessage());
         }

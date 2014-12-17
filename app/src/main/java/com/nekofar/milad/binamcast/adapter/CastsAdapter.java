@@ -112,9 +112,7 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         holder.mCastPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.mCastPlay.setVisibility(View.GONE);
-                holder.mCastPause.setVisibility(View.VISIBLE);
-                mBus.post(new PlayCastEvent(cast));
+                mBus.post(new PlayCastEvent(v));
             }
         });
 
@@ -123,14 +121,12 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         holder.mCastPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.mCastPlay.setVisibility(View.VISIBLE);
-                holder.mCastPause.setVisibility(View.GONE);
-                mBus.post(new PauseCastEvent(cast));
+                notifyDataSetChanged();
+                mBus.post(new PauseCastEvent(v));
             }
         });
 
         // Post download event if download button clicked
-        holder.mCastDownload.setTag(cast);
         holder.mCastDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,7 +135,6 @@ public class CastsAdapter extends RecyclerView.Adapter<CastsAdapter.ViewHolder> 
         });
 
         // Open podcast in browser on click
-        holder.mCastLink.setTag(cast);
         holder.mCastLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
