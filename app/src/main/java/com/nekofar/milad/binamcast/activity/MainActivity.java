@@ -248,6 +248,14 @@ public class MainActivity extends ActionBarActivity {
 
         }
         else {
+
+            // Set cast path if file already exist
+            if (cast.getPath().equals("")) {
+                mRealm.beginTransaction();
+                cast.setPath(filePath);
+                mRealm.commitTransaction();
+            }
+
             // Refresh casts list if cast file exist
             mBus.post(new RefreshCastsEvent());
         }
