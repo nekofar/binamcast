@@ -6,3 +6,7 @@ Binamcast
 Simple Podcast Downloader For [Binamcast][1]
 
 [1]: http://binamcast.ir
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/nekofar/binamcast/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
